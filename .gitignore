@@ -1,0 +1,6 @@
+target
+gradle
+bin
+build
+.venv
+__pycache__
