@@ -1,12 +1,9 @@
 from dataclasses import dataclass
-from turtle import Turtle, resetscreen, tracer, update
 
 import pygame
 
 from engine.board import Entity, EvaluatedBoard, Unit
 from engine.shared import Coord
-
-tracer(False)
 
 # the engine renders the game at a reduced resolution of `dimension`, however the drawing module needs to blow up the resolution to a higher resolution,
 # this is done using `scale`,
@@ -41,9 +38,23 @@ class Drawer:
         pygame.init()
         self.screen = pygame.display.set_mode((500, 500))
         self.clock = pygame.time.Clock()
+        self.clear()
+
+    def to_cartesian(self, coord: Coord) -> Coord:
+        (x, y) = coord
+        (dx, dy) = self.dimensions
+        return (x + (dx // 2), y + (dy // 2))
+
+    def draw_rectangle(self, coord: Coord, color: str):
+        coord = self.to_cartesian(coord)
+        print(f"drawing rectangle at {coord}")
+        (x_lb, y_lb) = (coord[0] * self.scale, coord[1] * self.scale)
+        (x_rt, y_rt) = ((coord[0] + 1) * self.scale, (coord[1] + 1) * self.scale)
+        pygame.draw.rect(self.screen, color, pygame.Rect(x_lb, y_lb, x_rt, y_rt))
 
     def draw_apple(self, coord: Coord):
         print(f"drew apple at {coord}")
+        self.draw_rectangle(coord, "red")
         # dw = new_turtle()
         # go(dw, coord)
 
@@ -54,6 +65,7 @@ class Drawer:
 
     def draw_snake_body(self, coord: Coord):
         print(f"drew snake body at {coord}")
+        self.draw_rectangle(coord, "green")
         # dw = new_turtle()
         # go(dw, coord)
 
@@ -117,10 +129,10 @@ class Drawer:
         self.draw_dialog("Unpause")
 
     def update(self):
-        update()
+        pygame.display.flip()
 
     def clear(self):
-        resetscreen()
+        self.screen.fill("black")
 
     # def show_results(self, state:State):
     #     pass

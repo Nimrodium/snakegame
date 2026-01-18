@@ -5,7 +5,6 @@ from enum import Enum, auto
 
 # from turtle import Screen
 import pygame
-
 from engine.shared import Direction
 
 

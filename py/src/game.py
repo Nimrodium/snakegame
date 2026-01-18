@@ -1,25 +1,11 @@
-import turtle
 from dataclasses import dataclass
 from enum import Enum, auto
-from time import sleep, time
+from time import time
 
 from engine.board import Board
-from engine.shared import Coord, Direction
+from engine.shared import Coord
 from gui.drawing import Drawer
 from gui.input import Input, Key
-
-keybinds = {
-    "w": Key.Up,
-    "s": Key.Down,
-    "a": Key.Left,
-    "d": Key.Right,
-    "q": Key.Exit,
-    "Up": Key.Up,
-    "Down": Key.Down,
-    "Left": Key.Left,
-    "Right": Key.Right,
-    "space": Key.PlayPause,
-}
 
 
 class Scene(Enum):
@@ -58,8 +44,6 @@ class Game:
     def initialize(
         dimensions: Coord, scale: float, frame_rate: int, keybindings: dict[str, Key]
     ) -> "Game":
-        screen = turtle.Screen()
-        screen.setup(width=scale * 10, height=scale * 10)
         return Game(
             Board(dimensions), Drawer(scale, dimensions), Input(keybindings), frame_rate
         )
@@ -122,39 +106,8 @@ class Game:
                 if state.scene == Scene.Exiting:
                     break
                 state.update_time()
-                sleep(self.frame_rate / 100)
+                # sleep(self.frame_rate / 100)
             except KeyboardInterrupt:
                 print("\nexiting...")
                 break
         return state
-
-
-def test(scale: int, dimensions: Coord, frame_rate: int):
-    turtle.Screen().setup(scale * 50, scale * 50)
-    board = Board(dimensions)
-    print(f"apple pos: {board.apple}")
-    print(f"snake_head pos: {board.snake.get_head()}")
-    drawer = Drawer(scale, dimensions)
-    for i in range(0, 10):
-        print(f"Frame {i + 1}")
-        drawer.draw_board(board.evaluate_state(Direction.Left)[0])
-        drawer.update()
-        drawer.clear()
-        # sleep(frame_rate * 0.001)
-
-    # drawer.draw_snake_body((0, 0))
-    turtle.done()
-
-
-def main():
-    scale = 10
-    dimensions = (100, 100)
-    frame_rate = 60
-    test(scale, dimensions, frame_rate)
-    # game = Game.initialize((100, 100), 1, 25, keybinds)
-    # game.loop()
-    # turtle.bye()
-
-
-if __name__ == "__main__":
-    main()
