@@ -60,7 +60,9 @@ class Game:
     ) -> "Game":
         screen = turtle.Screen()
         screen.setup(width=scale * 10, height=scale * 10)
-        return Game(Board(dimensions), Drawer(scale), Input(keybindings), frame_rate)
+        return Game(
+            Board(dimensions), Drawer(scale, dimensions), Input(keybindings), frame_rate
+        )
 
     def get_input(self) -> Key:
         user_input = self.key_input.get_input()
@@ -127,15 +129,12 @@ class Game:
         return state
 
 
-def main():
-    scale = 10
-    dimensions = (100, 100)
-    frame_rate = 60
+def test(scale: int, dimensions: Coord, frame_rate: int):
     turtle.Screen().setup(scale * 50, scale * 50)
     board = Board(dimensions)
     print(f"apple pos: {board.apple}")
     print(f"snake_head pos: {board.snake.get_head()}")
-    drawer = Drawer(scale)
+    drawer = Drawer(scale, dimensions)
     for i in range(0, 10):
         print(f"Frame {i + 1}")
         drawer.draw_board(board.evaluate_state(Direction.Left)[0])
@@ -145,6 +144,13 @@ def main():
 
     # drawer.draw_snake_body((0, 0))
     turtle.done()
+
+
+def main():
+    scale = 10
+    dimensions = (100, 100)
+    frame_rate = 60
+    test(scale, dimensions, frame_rate)
     # game = Game.initialize((100, 100), 1, 25, keybinds)
     # game.loop()
     # turtle.bye()

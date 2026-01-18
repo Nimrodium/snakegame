@@ -35,14 +35,15 @@ tracer(False)
 
 # @dataclass
 class Drawer:
-    def __init__(self,scale:float,dimensions:Coord):
+    def __init__(self, scale: float, dimensions: Coord):
         self.scale = scale
         self.dimensions = dimensions
         pygame.init()
-        self.screen = pygame.display.set_mode((500,500))
+        self.screen = pygame.display.set_mode((500, 500))
         self.clock = pygame.time.Clock()
 
     def draw_apple(self, coord: Coord):
+        print(f"drew apple at {coord}")
         # dw = new_turtle()
         # go(dw, coord)
 
@@ -52,6 +53,7 @@ class Drawer:
         # dw.end_fill()
 
     def draw_snake_body(self, coord: Coord):
+        print(f"drew snake body at {coord}")
         # dw = new_turtle()
         # go(dw, coord)
 
@@ -66,6 +68,8 @@ class Drawer:
         )  # for now snake head is rendered the same as snake body
 
     def draw_empty(self, coord: Coord):
+        pass
+        # print(f"drew empty at {coord}")
         # if False:
         #     dw = new_turtle()
         #     go(dw, coord)
@@ -97,6 +101,7 @@ class Drawer:
                 self.draw(unit)
 
     def draw_dialog(self, text: str):
+        pass
         # dw = new_turtle()
         # go(dw, (int(-self.scale * 10), int(self.scale * 10)))
         # dw.fillcolor("grey")

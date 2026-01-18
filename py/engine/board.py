@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from enum import Enum, auto
 from random import Random
 
@@ -49,6 +48,7 @@ class Board:
         ate_apple: bool = self.snake.get_head() == self.apple
         collision: bool = self.snake.collision()
         if ate_apple:
+            self.snake.grow()
             self.spawn_apple()
         self.snake.advance(direction)
         return (self.render(), ate_apple, collision)

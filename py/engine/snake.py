@@ -8,11 +8,12 @@ from engine.shared import Coord, Direction
 class Snake:
     # first segment is tail, last segment is head
     segments: list[Coord]
+    will_grow: bool
     dimensions: Coord
 
     @staticmethod
     def new(dimensions: Coord) -> "Snake":
-        return Snake([(0, 0), (1, 0), (2, 0)], dimensions)
+        return Snake([(0, 0), (1, 0), (2, 0)], False, dimensions)
 
     def get_head(self) -> Coord:
         return self.segments[-1]  # thankfully nullsnake is not possible
@@ -21,10 +22,16 @@ class Snake:
         return self.segments[0]
 
     def delete_tail(self):
-        self.segments.pop(0)
+        if not self.will_grow:
+            self.segments.pop(0)
+        else:
+            self.will_grow = False
 
     def add_head(self, head: Coord):
         self.segments.append(head)
+
+    def grow(self):
+        self.will_grow = True
 
     def advance(self, direction: Direction):
         (hx, hy) = self.get_head()
@@ -42,4 +49,5 @@ class Snake:
         self.add_head(head)
 
     def collision(self) -> bool:
+        # will check if any snake segments share the same coordinate, or if it is out of bounds of the board.
         return False
