@@ -36,25 +36,34 @@ class Drawer:
         self.scale = scale
         self.dimensions = dimensions
         pygame.init()
-        self.screen = pygame.display.set_mode((500, 500))
+        self.screen = pygame.display.set_mode(
+            self.dimensions
+            # (self.dimensions[0] * self.scale, self.dimensions[1] * self.scale)
+        )
         self.clock = pygame.time.Clock()
+        self.font = pygame.font.Font("freesansbold.ttf", 16)
         self.clear()
 
-    def to_cartesian(self, coord: Coord) -> Coord:
+    def from_cartesian(self, coord: Coord) -> Coord:
         (x, y) = coord
+        (x, y) = (int(x * self.scale // 2), int(y * self.scale // 2))
         (dx, dy) = self.dimensions
-        return (x + (dx // 2), y + (dy // 2))
+        return (x + (dx // 2), (dy // 2) - y)
 
-    def draw_rectangle(self, coord: Coord, color: str):
-        coord = self.to_cartesian(coord)
-        print(f"drawing rectangle at {coord}")
-        (x_lb, y_lb) = (coord[0] * self.scale, coord[1] * self.scale)
-        (x_rt, y_rt) = ((coord[0] + 1) * self.scale, (coord[1] + 1) * self.scale)
-        pygame.draw.rect(self.screen, color, pygame.Rect(x_lb, y_lb, x_rt, y_rt))
+    def draw_pixel(self, coord: Coord, color: str):
+        # coord is center of rectangle.
+        side_length = self.scale // 2
+        (x, y) = self.from_cartesian(coord)
+        (lx, ly) = (x - side_length, y - side_length)  # bottom left corner
+        (rx, ry) = (x + side_length, y + side_length)  # top right corner
+        print(f"drawing rectangle at {(rx, ry)}:{(lx, ly)}")
+        pygame.draw.rect(
+            self.screen, color, pygame.Rect(lx, ly, side_length, side_length)
+        )
 
     def draw_apple(self, coord: Coord):
-        print(f"drew apple at {coord}")
-        self.draw_rectangle(coord, "red")
+        # print(f"drew apple at {coord}")
+        self.draw_pixel(coord, "red")
         # dw = new_turtle()
         # go(dw, coord)
 
@@ -64,8 +73,8 @@ class Drawer:
         # dw.end_fill()
 
     def draw_snake_body(self, coord: Coord):
-        print(f"drew snake body at {coord}")
-        self.draw_rectangle(coord, "green")
+        # print(f"drew snake body at {coord}")
+        self.draw_pixel(coord, "green")
         # dw = new_turtle()
         # go(dw, coord)
 
@@ -80,6 +89,7 @@ class Drawer:
         )  # for now snake head is rendered the same as snake body
 
     def draw_empty(self, coord: Coord):
+        # self.draw_rectangle(coord, "yellow")
         pass
         # print(f"drew empty at {coord}")
         # if False:
@@ -97,6 +107,7 @@ class Drawer:
             case Entity.Empty:
                 self.draw_empty(coord)
             case Entity.Apple:
+                # print(f"APPLE: {coord}")
                 self.draw_apple(coord)
             case Entity.SnakeBody:
                 self.draw_snake_body(coord)
@@ -110,9 +121,20 @@ class Drawer:
             # t.right(90)
             # t.forward(90)
             for unit in row:
+                if unit[1] != Entity.Empty:
+                    print(unit)
                 self.draw(unit)
 
     def draw_dialog(self, text: str):
+        rendered_text = self.font.render(
+            text,
+            True,
+            (255, 255, 255),
+        )
+        rect = rendered_text.get_rect()
+        # rect.center = (self.dimensions[0] // 2, self.dimensions[1] // 2)
+        rect.center = self.from_cartesian((0, 0))
+        self.screen.blit(rendered_text, rect)
         pass
         # dw = new_turtle()
         # go(dw, (int(-self.scale * 10), int(self.scale * 10)))

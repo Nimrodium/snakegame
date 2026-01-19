@@ -2,6 +2,9 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from time import time
 
+import pygame
+from pygame.event import Event
+
 from engine.board import Board
 from engine.shared import Coord
 from gui.drawing import Drawer
@@ -42,10 +45,13 @@ class Game:
 
     @staticmethod
     def initialize(
-        dimensions: Coord, scale: float, frame_rate: int, keybindings: dict[str, Key]
+        dimensions: Coord, scale: float, frame_rate: int, keybindings: dict[int, Key]
     ) -> "Game":
         return Game(
-            Board(dimensions), Drawer(scale, dimensions), Input(keybindings), frame_rate
+            Board(dimensions, scale),
+            Drawer(scale, dimensions),
+            Input(keybindings),
+            frame_rate,
         )
 
     def get_input(self) -> Key:
@@ -57,9 +63,14 @@ class Game:
 
     def step(self, state: State) -> State:
         user_input = self.get_input()
+        match user_input:
+            case Key.Exit:
+                state.scene = Scene.Exiting
+        print(user_input)
         match state.scene:
             case Scene.Exiting:
-                raise RuntimeError("IllegalState: cannot step when exiting")
+                pass
+                # raise RuntimeError("IllegalState: cannot step when exiting")
             case Scene.Paused:
                 if user_input == Key.PlayPause:
                     state.scene = Scene.Playing
@@ -88,24 +99,19 @@ class Game:
 
         return state
 
-        # if user_input == Key.Exit:
-        #     return
-        # if not start and not reset:
-        #     evaluated, ate_apple = self.board.evaluate_state(user_input.to_direction())
-        #     self.drawer.draw_board(evaluated)
-        #     return
-        # elif start:
-
-    def loop(self) -> State:  # apples ate, time
+    def loop(self) -> State:
         state = State(0, 0, Scene.Start)
         # start = time()
         while True:
             try:
+                self.drawer.clear()
                 print(f"State Scene: {state.scene} -- Time: {state.time}")
                 state = self.step(state)
                 if state.scene == Scene.Exiting:
                     break
                 state.update_time()
+                self.drawer.update()
+                self.drawer.clock.tick(self.frame_rate)
                 # sleep(self.frame_rate / 100)
             except KeyboardInterrupt:
                 print("\nexiting...")

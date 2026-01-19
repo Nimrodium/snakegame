@@ -15,29 +15,48 @@ class Entity(Enum):
 Unit = tuple[Coord, Entity]
 EvaluatedBoard = list[list[Unit]]
 
+i: int = -50
+
 
 class Board:
-    def __init__(self, dimensions: Coord):
+    def __init__(self, dimensions: Coord, scale: float):
+        MAGIC_RANDOM_SCALE_FACTOR = 2  # ??? no idea why i have to 2x it
         self.snake = Snake.new(dimensions)
-        self.dimensions = dimensions
+        self.dimensions = (
+            dimensions[0] // int(scale) * MAGIC_RANDOM_SCALE_FACTOR,
+            dimensions[1] // int(scale) * MAGIC_RANDOM_SCALE_FACTOR,
+        )
+
+        # self.dimensions = dimensions
         self.apple = (0, 0)
         self.spawn_apple()
 
     def spawn_apple(self):
+        # global i
+        # i += 1
+        # self.apple = (i, i)
+        # return
         (xbound, ybound) = self.dimensions
         rand = Random()
-        adjecents: list[Coord] = []
+        # adjecents: list[Coord] = []
         (xapple, yapple) = self.apple
-        for y in range(-1, 2):
-            for x in range(-1, 2):
-                adjecents.append((xapple + x, yapple + y))
+        # for y in range(-1, 2):
+        #     for x in range(-1, 2):
+        #         adjecents.append((xapple + x, yapple + y))
 
+        adjacents = [
+            (xapple + dx, yapple + dy) for dx in range(-1, -2) for dy in range(-1, 2)
+        ]
         while True:
-            position = int(rand.random() * xbound), int(rand.random() * ybound)
+            position = (
+                int((rand.random() * xbound) - (xbound // 2)),
+                int((rand.random() * ybound) - (ybound // 2)),
+            )
+            # position = (250, 250)
             if (
                 position != self.apple
                 and position not in self.snake.segments
-                and position not in adjecents
+                and position not in adjacents
             ):
                 self.apple = position
                 break
@@ -56,9 +75,9 @@ class Board:
     def render(self) -> EvaluatedBoard:
         (xbound, ybound) = self.dimensions
         rows: EvaluatedBoard = []
-        for row in range(0, ybound + 1):
+        for row in range(-ybound // 2, ybound // 2 + 1):
             eval_row: list[Unit] = []
-            for column in range(0, xbound):
+            for column in range(-xbound // 2, xbound // 2 + 1):
                 coord = (column, row)
                 entity: Entity
                 if coord == self.snake.get_head():
