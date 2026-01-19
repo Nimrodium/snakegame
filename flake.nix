@@ -18,7 +18,7 @@
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        snakeGamePy = pkgs.callPackage ./snakegame.nix { inherit pyproject-nix; };
+        snakeGamePy = pkgs.callPackage ./py/snakegame.nix { inherit pyproject-nix; };
       in
       {
         # devShell = pkgs.mkShell {
