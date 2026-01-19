@@ -1,4 +1,4 @@
-{ pkgs, pyproject-nix, ... }:
+{ pkgs, ... }:
 # I cannot use uv2nix. i cannot package this as a python package.
 # pygame refuses to use a real driver unless i directly use pkgs.python311.pythonPackages.pygame.
 # which i can only use if i directly run python ./src/main.py

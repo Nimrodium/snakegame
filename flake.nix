@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
     flake-utils.url = "github:numtide/flake-utils";
-    pyproject-nix.url = "github:nix-community/pyproject.nix";
+    naersk.url = "github:nix-community/naersk";
   };
 
   outputs =
@@ -12,13 +12,14 @@
       self,
       nixpkgs,
       flake-utils,
-      pyproject-nix,
+      naersk,
     }:
     flake-utils.lib.eachDefaultSystem (
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        snakeGamePy = pkgs.callPackage ./py/snakegame.nix { inherit pyproject-nix; };
+        snakeGamePy = pkgs.callPackage ./py/snakegame.nix { };
+        snakeGameRs = pkgs.callPackage ./rs/snakegame.nix { inherit naersk; };
       in
       {
         # devShell = pkgs.mkShell {
@@ -26,9 +27,11 @@
         # };
         devShell = {
           py = snakeGamePy.devShell;
+          rs = snakeGameRs.devShell;
         };
         packages = rec {
           py = snakeGamePy.package;
+          rs = snakeGameRs.package;
         };
       }
     );
