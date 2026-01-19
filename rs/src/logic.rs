@@ -14,6 +14,39 @@ pub enum Direction {
     Left,
     Right,
 }
+impl Direction {
+    pub fn is_opposite(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Direction::Up, Direction::Down) => true,
+            (Direction::Down, Direction::Up) => true,
+            (Direction::Left, Direction::Right) => true,
+            (Direction::Right, Direction::Left) => true,
+            _ => false,
+        }
+    }
+    fn filter_opposite(&self, other: &Self) -> Option<&Self> {
+        if self.is_opposite(other) {
+            None
+        } else {
+            Some(&self)
+        }
+    }
+    // specific wrapper for handling Option<Self>
+    fn filter_opposite_option<'a>(
+        direction: &'a Option<Self>,
+        other_direction: &'a Option<Self>,
+    ) -> Option<&'a Self> {
+        if let Some(d) = direction {
+            if let Some(od) = other_direction {
+                d.filter_opposite(od)
+            } else {
+                Some(d)
+            }
+        } else {
+            None
+        }
+    }
+}
 pub enum Scene {
     Start,
     Paused,
@@ -44,7 +77,7 @@ impl Dimensions {
     }
 
     pub fn out_of_bounds(&self, (x, y): CartesianCoordinate) -> bool {
-        x < self.xmin || x > self.xmax || y < self.ymin || x > self.ymax
+        x < self.xmin || x > self.xmax || y < self.ymin || y > self.ymax
     }
 
     pub fn to_raster(&self, (x, y): CartesianCoordinate) -> RasterCoordinate {
@@ -67,11 +100,14 @@ pub struct State {
     snake: Snake,
     dimensions: Dimensions,
     scene: Scene,
+    score: usize,
 }
 impl State {
     pub fn evaluate(&mut self, direction: Option<Direction>) -> EvaluatedState {
-        self.move_snake(direction);
+        self.move_snake(Direction::filter_opposite_option(direction, self.direction));
+        self.will_grow = false;
         if self.ate_apple() {
+            self.score += 1;
             self.will_grow = true;
             self.spawn_apple();
         }
