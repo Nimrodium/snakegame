@@ -21,14 +21,17 @@ i: int = -50
 class Board:
     def __init__(self, dimensions: Coord, scale: float):
         MAGIC_RANDOM_SCALE_FACTOR = 2  # ??? no idea why i have to 2x it
-        self.snake = Snake.new(dimensions)
         self.dimensions = (
             dimensions[0] // int(scale) * MAGIC_RANDOM_SCALE_FACTOR,
             dimensions[1] // int(scale) * MAGIC_RANDOM_SCALE_FACTOR,
         )
-
+        self.snake = Snake(self.dimensions)
         # self.dimensions = dimensions
         self.apple = (0, 0)
+        self.spawn_apple()
+
+    def reset(self):
+        self.snake.reset()
         self.spawn_apple()
 
     def spawn_apple(self):
@@ -65,11 +68,11 @@ class Board:
         self, direction: Direction
     ) -> tuple[EvaluatedBoard, bool, bool]:  # ate_apple,collision
         ate_apple: bool = self.snake.get_head() == self.apple
-        collision: bool = self.snake.collision()
         if ate_apple:
             self.snake.grow()
             self.spawn_apple()
         self.snake.advance(direction)
+        collision: bool = self.snake.collision()
         return (self.render(), ate_apple, collision)
 
     def render(self) -> EvaluatedBoard:

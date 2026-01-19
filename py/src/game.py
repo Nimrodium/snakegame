@@ -13,7 +13,7 @@ from gui.input import Input, Key
 
 class Scene(Enum):
     Start = auto()
-    PlayAgain = auto()
+    Dead = auto()
     Paused = auto()
     Playing = auto()
     Exiting = auto()
@@ -91,11 +91,15 @@ class Game:
                     if ate_apple:
                         state.add_apple()
                     self.drawer.draw_board(evaluated)
-            case Scene.PlayAgain:
+                    if collision:
+                        print("You Died!")
+                        state.scene = Scene.Dead
+            case Scene.Dead:
                 if user_input == Key.PlayPause:
+                    self.board.reset()
                     state.scene = Scene.Playing
                 else:
-                    self.drawer.draw_start()
+                    self.drawer.draw_dead(state.apples_ate)
 
         return state
 
