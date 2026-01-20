@@ -37,7 +37,7 @@ impl Game {
         let mut state = State::new(&self.dimensions);
         let mut renderer = Renderer::new(&self.dimensions, self.scale);
         let mut i = 0;
-        let mut actions = vec![
+        let actions = vec![
             Some(Event::PlayPause),
             Some(Event::Up),
             None,

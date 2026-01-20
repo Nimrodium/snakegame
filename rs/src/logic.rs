@@ -102,13 +102,13 @@ impl State {
             will_grow: false,
             last_direction: None,
             apples_ate: 0,
-            apple_position: (2, 1),
+            apple_position: (0, 0),
             snake: Snake::new(),
             dimensions: dimensions.clone(),
             scene: Scene::Start,
             score: 0,
         };
-        // state.spawn_apple();
+        state.spawn_apple();
         state
     }
     pub fn evaluate(&mut self, direction: &Option<Direction>) -> EvaluatedState {
@@ -130,13 +130,16 @@ impl State {
             &self.last_direction.clone()
         };
         self.move_snake(filtered_direction);
-
         self.will_grow = false;
         if self.ate_apple() {
             self.score += 1;
             self.will_grow = true;
             eprintln!("ate apple! score={}", self.score);
             self.spawn_apple();
+        }
+        if self.snake.collision(&self.dimensions) {
+            self.scene = Scene::Dead;
+            eprintln!("You Died!");
         }
         let mut evaluated: EvaluatedState = self
             .snake
@@ -187,31 +190,8 @@ impl State {
         *self.snake.get_head() == self.apple_position
     }
 }
-// struct CoordinateSpace<T> {
-//     dimensions: Dimensions,
-//     space: Vec<Vec<T>>,
-// }
-// impl<T> CoordinateSpace<T> {
-//     fn get_cartesian(&self, cartesian: CartesianCoordinate) -> Option<&T> {
-//         self.get_raster(self.dimensions.to_raster(cartesian))
-//     }
-//     fn set_cartesian(&mut self, cartesian: CartesianCoordinate, value: T) {
-//         self.set_raster(self.dimensions.to_raster(cartesian), value);
-//     }
 
-//     fn get_raster(&self, (x, y): RasterCoordinate) -> Option<&T> {
-//         self.space.get(y).and_then(|xs| xs.get(x))
-//     }
-
-//     fn set_raster(&mut self, (x, y): RasterCoordinate, value: T) {
-//         self.space
-//             .get_mut(y)
-//             .and_then(|xs| xs.get_mut(x))
-//             .and_then(|v| Some(*v = value));
-//     }
-// }
-
-struct Snake {
+pub struct Snake {
     segments: Vec<CartesianCoordinate>,
 }
 impl Snake {
