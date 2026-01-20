@@ -6,7 +6,7 @@ and then rewrite it in languages im less comfortable with, (java),
  and then finally rewrite it in languages i am scared of, C and Haskell.
 
 * *Python* = 95%
-* *Rust* = 1%
+* *Rust* = 65%
 * *Java* = 1%
 * *Scala* = 1%
 * *Kotlin* = 1%
