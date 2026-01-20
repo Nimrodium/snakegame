@@ -1,4 +1,5 @@
-use std::collections::HashSet;
+use rand::prelude::*;
+use std::{collections::HashSet, thread::current};
 pub enum TileType {
     Snake,
     Apple,
@@ -8,6 +9,7 @@ pub type EvaluatedState = Vec<(CartesianCoordinate, TileType)>;
 pub type CartesianCoordinate = (isize, isize);
 pub type RasterCoordinate = (usize, usize);
 
+#[derive(Clone, Debug, Copy)]
 pub enum Direction {
     Up,
     Down,
@@ -31,38 +33,26 @@ impl Direction {
             Some(&self)
         }
     }
-    // specific wrapper for handling Option<Self>
-    fn filter_opposite_option<'a>(
-        direction: &'a Option<Self>,
-        other_direction: &'a Option<Self>,
-    ) -> Option<&'a Self> {
-        if let Some(d) = direction {
-            if let Some(od) = other_direction {
-                d.filter_opposite(od)
-            } else {
-                Some(d)
-            }
-        } else {
-            None
-        }
-    }
 }
+#[derive(Clone, Copy, Debug)]
 pub enum Scene {
     Start,
     Paused,
     Playing,
     Dead,
+    // Exit,
 }
+#[derive(Debug, Clone)]
 pub struct Dimensions {
     xmin: isize,
     xmax: isize,
     ymin: isize,
     ymax: isize,
-    abs: CartesianCoordinate,
+    abs: RasterCoordinate,
 }
 impl Dimensions {
-    pub fn new((x, y): CartesianCoordinate) -> Self {
-        let (dx, dy) = (x / 2, y / 2);
+    pub fn new((x, y): RasterCoordinate) -> Self {
+        let (dx, dy) = ((x / 2) as isize, (y / 2) as isize);
 
         Self {
             xmin: -dx,
@@ -89,26 +79,63 @@ impl Dimensions {
     }
     /// returns a random coordinate
     pub fn random(&self) -> CartesianCoordinate {
-        todo!()
+        let mut rng = rand::rng();
+        (
+            rng.random_range(self.xmin as i32..=self.xmax as i32) as isize,
+            rng.random_range(self.ymin as i32..=self.ymax as i32) as isize,
+        )
     }
 }
 pub struct State {
-    will_grow: bool,
-    direction: Option<Direction>,
-    apples_ate: usize,
-    apple_position: CartesianCoordinate,
-    snake: Snake,
-    dimensions: Dimensions,
-    scene: Scene,
-    score: usize,
+    pub will_grow: bool,
+    pub last_direction: Option<Direction>,
+    pub apples_ate: usize,
+    pub apple_position: CartesianCoordinate,
+    pub snake: Snake,
+    pub dimensions: Dimensions,
+    pub scene: Scene,
+    pub score: usize,
 }
 impl State {
-    pub fn evaluate(&mut self, direction: Option<Direction>) -> EvaluatedState {
-        self.move_snake(Direction::filter_opposite_option(direction, self.direction));
+    pub fn new(dimensions: &Dimensions) -> Self {
+        let mut state = Self {
+            will_grow: false,
+            last_direction: None,
+            apples_ate: 0,
+            apple_position: (2, 1),
+            snake: Snake::new(),
+            dimensions: dimensions.clone(),
+            scene: Scene::Start,
+            score: 0,
+        };
+        // state.spawn_apple();
+        state
+    }
+    pub fn evaluate(&mut self, direction: &Option<Direction>) -> EvaluatedState {
+        // check if direction is Some, check if its opposite, if opposite return None, if not Some return None,
+        // if last direction was None then return direction
+        let filtered_direction = if let Some(current_direction) = direction {
+            if let Some(last_direction) = self.last_direction.clone() {
+                if !current_direction.is_opposite(&last_direction) {
+                    // self.last_direction = direction.clone();
+                    direction
+                } else {
+                    &None
+                }
+            } else {
+                self.last_direction = direction.clone();
+                direction
+            }
+        } else {
+            &self.last_direction.clone()
+        };
+        self.move_snake(filtered_direction);
+
         self.will_grow = false;
         if self.ate_apple() {
             self.score += 1;
             self.will_grow = true;
+            eprintln!("ate apple! score={}", self.score);
             self.spawn_apple();
         }
         let mut evaluated: EvaluatedState = self
@@ -120,6 +147,17 @@ impl State {
             .collect();
         evaluated.push((self.apple_position, TileType::Apple));
         evaluated
+    }
+
+    pub fn toggle_playpause(&mut self) {
+        self.scene = match self.scene {
+            Scene::Start => Scene::Playing,
+            Scene::Paused => Scene::Playing,
+            Scene::Playing => Scene::Paused,
+            Scene::Dead => Scene::Playing,
+            _ => self.scene,
+        };
+        println!("toggled scene to {:?}", self.scene)
     }
     fn spawn_apple(&mut self) {
         // let unavailable_coordinates = vec![self.apple_position].append(self.snake.segments.clone());
@@ -140,13 +178,9 @@ impl State {
             .flatten()
             .collect()
     }
-    fn move_snake(&mut self, direction: Option<Direction>) {
-        if let Some(d) = &direction {
+    fn move_snake(&mut self, direction: &Option<Direction>) {
+        if let Some(d) = direction {
             self.snake.advance(self.will_grow, d);
-        } else if let Some(ld) = &self.direction {
-            self.snake.advance(self.will_grow, ld);
-        } else {
-            () // expliciting doing nothing
         }
     }
     fn ate_apple(&self) -> bool {
@@ -181,16 +215,10 @@ struct Snake {
     segments: Vec<CartesianCoordinate>,
 }
 impl Snake {
-    fn initial() -> Vec<CartesianCoordinate> {
-        vec![(0, 0), (1, 0), (2, 0)]
-    }
     fn new() -> Self {
         Self {
-            segments: Self::initial(),
+            segments: vec![(0, 0), (1, 0), (2, 0)],
         }
-    }
-    fn reset(&mut self) {
-        self.segments = Self::initial()
     }
     fn move_head(&mut self, direction: &Direction) {
         let (hx, hy) = self.get_head();
@@ -213,6 +241,7 @@ impl Snake {
     }
     fn advance(&mut self, will_grow: bool, direction: &Direction) {
         self.move_head(direction);
+        eprintln!("moving snake {direction:?}");
         if !will_grow {
             self.remove_tail();
         }
