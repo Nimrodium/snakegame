@@ -18,3 +18,5 @@ in python, initially engine was the stateful object, but then it would return a 
 
 in the rust impl, all the coordinate transformations are performed at `draw_pixel`, which makes the pipeline more explicit.
 it is critical to apply the scale factor to coordinates BEFORE translating them to raster, else you get expansion from the raster origin instead of the cartesian origin. in the rust code, it is explicitely a nested function call `self.dimensions.to_raster(self.scale_coordinates(cartesian))`
+
+currently there is a bug where the snake's tail grows random parts for no reason. these only appear after a few frames.

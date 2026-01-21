@@ -118,13 +118,14 @@ impl State {
         let filtered_direction = if let Some(current_direction) = direction {
             if let Some(last_direction) = self.last_direction.clone() {
                 if !current_direction.is_opposite(&last_direction) {
-                    // self.last_direction = direction.clone();
+                    self.last_direction = direction.clone();
                     direction
                 } else {
-                    &None
+                    &self.last_direction.clone()
                 }
             } else {
                 self.last_direction = direction.clone();
+                eprintln!("--- SETTING LAST DIRECTION TO {direction:?}");
                 direction
             }
         } else {
