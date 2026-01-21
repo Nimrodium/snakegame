@@ -1,7 +1,8 @@
 use std::{thread::sleep, time::Duration};
 
 use crate::{
-    logic::{Dimensions, Direction, Scene, State},
+    dimensions::Dimensions,
+    logic::{Direction, Scene, State},
     renderer::{GameEvent, Renderer},
 };
 pub struct Game {

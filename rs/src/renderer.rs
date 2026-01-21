@@ -1,8 +1,7 @@
 use std::collections::VecDeque;
 
-use crate::logic::{
-    CartesianCoordinate, Dimensions, Direction, EvaluatedState, RasterCoordinate, TileType,
-};
+use crate::dimensions::{Dimensions, LogicalCoordinate};
+use crate::logic::{Direction, EvaluatedState, TileType};
 use sdl3::event::Event;
 use sdl3::keyboard::Keycode;
 use sdl3::pixels::Color;
@@ -52,7 +51,7 @@ impl Renderer {
         let video_subsystem = sdl_context
             .video()
             .map_err(|e| format!("could not initialize video subsystem of SDL3. {hint}: {e:?}"))?;
-        let (x, y) = dimensions.get_raster_bounds();
+        let (x, y) = dimensions.get_screen_bounds();
         let window = video_subsystem
             .window("SnakeGame (Rust)", x as u32, y as u32)
             .position_centered()
@@ -91,17 +90,12 @@ impl Renderer {
             }
         }
     }
-    pub fn draw_pixel(&mut self, cartesian: CartesianCoordinate, color: Color) {
+    pub fn draw_pixel(&mut self, cartesian: LogicalCoordinate, color: Color) {
         // let (x, y) = self.scale_coordinate(self.dimensions.to_raster(cartesian));
-        let (x, y) = self.dimensions.to_raster(self.scale_coordinate(cartesian));
+        let (x, y) = self.dimensions.to_screen(self.scale_coordinate(cartesian));
         let side_length = self.scale / 2;
-        let (cx, cy) = (x - side_length, y - side_length);
-        // let px = Rect::new(
-        //     (x * self.scale) as i32,
-        //     (y * self.scale) as i32,
-        //     self.scale as u32,
-        //     self.scale as u32,
-        // );
+
+        let (cx, cy) = (x.saturating_sub(side_length), y.saturating_sub(side_length));
         let test_rect = Rect::new(cx as i32, cy as i32, side_length as u32, side_length as u32);
         self.canvas.set_draw_color(color);
         self.canvas.fill_rect(test_rect).unwrap();
@@ -111,7 +105,7 @@ impl Renderer {
         );
     }
 
-    fn scale_coordinate(&self, (x, y): CartesianCoordinate) -> CartesianCoordinate {
+    fn scale_coordinate(&self, (x, y): LogicalCoordinate) -> LogicalCoordinate {
         // let scale = |x| x * self.scale / 2;
         // let (dx, dy) = self.dimensions.get_raster_bounds();
         // (scale(x) + (dx / 2), (dy / 2) - scale(y))

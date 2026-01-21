@@ -1,12 +1,12 @@
 use rand::prelude::*;
-use std::{collections::HashSet, thread::current};
+use std::collections::HashSet;
+
+use crate::dimensions::{Dimensions, LogicalCoordinate};
 pub enum TileType {
     Snake,
     Apple,
 }
-pub type EvaluatedState = Vec<(CartesianCoordinate, TileType)>;
-pub type CartesianCoordinate = (isize, isize);
-pub type RasterCoordinate = (usize, usize);
+pub type EvaluatedState = Vec<(LogicalCoordinate, TileType)>;
 
 #[derive(Clone, Debug, Copy)]
 pub enum Direction {
@@ -40,58 +40,12 @@ pub enum Scene {
     Playing,
     Dead,
 }
-#[derive(Debug, Clone)]
-pub struct Dimensions {
-    xmin: isize,
-    xmax: isize,
-    ymin: isize,
-    ymax: isize,
-    abs: RasterCoordinate,
-}
-impl Dimensions {
-    pub fn new((x, y): RasterCoordinate) -> Self {
-        let (dx, dy) = ((x / 2) as isize, (y / 2) as isize);
 
-        Self {
-            xmin: -dx,
-            xmax: dx,
-            ymin: -dy,
-            ymax: dy,
-            abs: (x, y),
-        }
-    }
-    pub fn bounds(&self) -> (CartesianCoordinate, CartesianCoordinate) {
-        ((self.xmin, self.xmax), (self.ymin, self.ymax))
-    }
-
-    pub fn out_of_bounds(&self, (x, y): CartesianCoordinate) -> bool {
-        x < self.xmin || x > self.xmax || y < self.ymin || y > self.ymax
-    }
-
-    pub fn to_raster(&self, (x, y): CartesianCoordinate) -> RasterCoordinate {
-        ((x + self.xmax) as usize, (self.ymax - y) as usize)
-    }
-
-    pub fn to_cartesian(&self, (x, y): RasterCoordinate) -> CartesianCoordinate {
-        ((x as isize - self.xmax), (y as isize - self.ymax))
-    }
-    /// returns a random coordinate
-    pub fn random(&self) -> CartesianCoordinate {
-        let mut rng = rand::rng();
-        (
-            rng.random_range(self.xmin as i32..=self.xmax as i32) as isize,
-            rng.random_range(self.ymin as i32..=self.ymax as i32) as isize,
-        )
-    }
-    pub fn get_raster_bounds(&self) -> RasterCoordinate {
-        self.abs
-    }
-}
 pub struct State {
     pub will_grow: bool,
     pub last_direction: Option<Direction>,
     pub apples_ate: usize,
-    pub apple_position: CartesianCoordinate,
+    pub apple_position: LogicalCoordinate,
     pub snake: Snake,
     pub dimensions: Dimensions,
     pub scene: Scene,
@@ -175,7 +129,7 @@ impl State {
             }
         }
     }
-    fn get_adjacent_apple_coordinates(&self) -> Vec<CartesianCoordinate> {
+    fn get_adjacent_apple_coordinates(&self) -> Vec<LogicalCoordinate> {
         let (ax, ay) = self.apple_position;
         (-1..=1)
             .into_iter()
@@ -194,7 +148,7 @@ impl State {
 }
 
 pub struct Snake {
-    segments: Vec<CartesianCoordinate>,
+    segments: Vec<LogicalCoordinate>,
 }
 impl Snake {
     fn new() -> Self {
@@ -212,10 +166,10 @@ impl Snake {
         };
         self.add_head(new_head);
     }
-    fn get_head(&self) -> &CartesianCoordinate {
+    fn get_head(&self) -> &LogicalCoordinate {
         self.segments.last().unwrap()
     }
-    fn add_head(&mut self, head: CartesianCoordinate) {
+    fn add_head(&mut self, head: LogicalCoordinate) {
         self.segments.push(head);
     }
     fn remove_tail(&mut self) {

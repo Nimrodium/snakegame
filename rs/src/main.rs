@@ -2,7 +2,8 @@
 // use sdl3;
 use sdl3;
 
-use crate::{game::Game, logic::Dimensions};
+use crate::{dimensions::Dimensions, game::Game};
+mod dimensions;
 mod game;
 mod logic;
 mod renderer;
