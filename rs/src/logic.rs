@@ -3,7 +3,6 @@ use std::{collections::HashSet, thread::current};
 pub enum TileType {
     Snake,
     Apple,
-    Null,
 }
 pub type EvaluatedState = Vec<(CartesianCoordinate, TileType)>;
 pub type CartesianCoordinate = (isize, isize);
@@ -40,7 +39,6 @@ pub enum Scene {
     Paused,
     Playing,
     Dead,
-    // Exit,
 }
 #[derive(Debug, Clone)]
 pub struct Dimensions {
@@ -84,6 +82,9 @@ impl Dimensions {
             rng.random_range(self.xmin as i32..=self.xmax as i32) as isize,
             rng.random_range(self.ymin as i32..=self.ymax as i32) as isize,
         )
+    }
+    pub fn get_raster_bounds(&self) -> RasterCoordinate {
+        self.abs
     }
 }
 pub struct State {
