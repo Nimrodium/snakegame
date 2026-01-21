@@ -196,8 +196,7 @@ impl Snake {
         let wall_coll = self
             .segments
             .iter()
-            .map(|seg| dimensions.out_of_bounds(*seg))
-            .any(|t| t);
+            .any(|seg| dimensions.out_of_bounds(*seg));
         let self_coll = {
             let mut uniq = HashSet::new();
             !self.segments.iter().all(|x| uniq.insert(x))
