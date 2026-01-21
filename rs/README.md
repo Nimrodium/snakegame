@@ -20,3 +20,5 @@ in the rust impl, all the coordinate transformations are performed at `draw_pixe
 it is critical to apply the scale factor to coordinates BEFORE translating them to raster, else you get expansion from the raster origin instead of the cartesian origin. in the rust code, it is explicitely a nested function call `self.dimensions.to_raster(self.scale_coordinates(cartesian))`
 
 currently there is a bug where the snake's tail grows random parts for no reason. these only appear after a few frames.
+
+another thing is, since the renderer scales each logical pixel by `scale`, the actual logical bounds are realbounds/scale, eg. 500x500 real has a logical resolution of 33x33

@@ -10,9 +10,10 @@ pub struct Dimensions {
     ymin: isize,
     ymax: isize,
     abs: ScreenCoordinates,
+    scale: isize,
 }
 impl Dimensions {
-    pub fn new((x, y): ScreenCoordinates) -> Self {
+    pub fn new((x, y): ScreenCoordinates, scale: usize) -> Self {
         let (dx, dy) = ((x / 2) as isize, (y / 2) as isize);
 
         Self {
@@ -21,6 +22,7 @@ impl Dimensions {
             ymin: -dy,
             ymax: dy,
             abs: (x, y),
+            scale: scale as isize,
         }
     }
     pub fn bounds(&self) -> (LogicalCoordinate, LogicalCoordinate) {
@@ -51,8 +53,10 @@ impl Dimensions {
     pub fn random(&self) -> LogicalCoordinate {
         let mut rng = rand::rng();
         (
-            rng.random_range(self.xmin as i32..=self.xmax as i32) as isize,
-            rng.random_range(self.ymin as i32..=self.ymax as i32) as isize,
+            rng.random_range((self.xmin / self.scale) as i32..=(self.xmax / self.scale) as i32)
+                as isize,
+            rng.random_range((self.ymin / self.scale) as i32..=(self.ymax / self.scale) as i32)
+                as isize,
         )
     }
     pub fn get_screen_bounds(&self) -> ScreenCoordinates {
