@@ -44,7 +44,6 @@ pub enum Scene {
 pub struct State {
     pub will_grow: bool,
     pub last_direction: Option<Direction>,
-    pub apples_ate: usize,
     pub apple_position: LogicalCoordinate,
     pub snake: Snake,
     pub dimensions: Dimensions,
@@ -56,7 +55,6 @@ impl State {
         let mut state = Self {
             will_grow: false,
             last_direction: None,
-            apples_ate: 0,
             apple_position: (0, 0),
             snake: Snake::new(),
             dimensions: dimensions.clone(),
@@ -113,11 +111,23 @@ impl State {
             Scene::Start => Scene::Playing,
             Scene::Paused => Scene::Playing,
             Scene::Playing => Scene::Paused,
-            Scene::Dead => Scene::Playing,
+            Scene::Dead => {
+                self.reset();
+                Scene::Playing
+            }
             _ => self.scene,
         };
         println!("toggled scene to {:?}", self.scene)
     }
+
+    fn reset(&mut self) {
+        self.snake = Snake::new();
+        self.score = 0;
+        self.will_grow = false;
+
+        self.spawn_apple();
+    }
+
     fn spawn_apple(&mut self) {
         // let unavailable_coordinates = vec![self.apple_position].append(self.snake.segments.clone());
         let mut unavailable_coordinates = self.snake.segments.clone();
