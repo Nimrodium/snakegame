@@ -10,5 +10,7 @@ fn main() {
     let frame_rate = 15;
     let dimensions = Dimensions::new((500, 500));
     let scale = 15;
-    Game::new(frame_rate, &dimensions, scale).game_loop();
+    Game::new(frame_rate, &dimensions, scale)
+        .game_loop()
+        .unwrap();
 }

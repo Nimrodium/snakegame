@@ -15,3 +15,6 @@ another stupid thing was that it rendered the entire board into a coordinate sys
 something much more efficient would just be to ship just a vector of the units, since it uses the embedded coordinates to render its position anyways.
 
 in python, initially engine was the stateful object, but then it would return a large supertuple of evaluated flags, which i encapsulated in `State`, but then that meant that there were two stateful objects, three if you count `Snake`. so I will be reorganizing board into State, with the `Board.evaluate_state` method being remapped to `State.evaluate` which returns the coordinates to be rendered, but mutates its state with the new evaluation
+
+in the rust impl, all the coordinate transformations are performed at `draw_pixel`, which makes the pipeline more explicit.
+it is critical to apply the scale factor to coordinates BEFORE translating them to raster, else you get expansion from the raster origin instead of the cartesian origin. in the rust code, it is explicitely a nested function call `self.dimensions.to_raster(self.scale_coordinates(cartesian))`

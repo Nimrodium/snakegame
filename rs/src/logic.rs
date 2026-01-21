@@ -69,7 +69,7 @@ impl Dimensions {
     }
 
     pub fn to_raster(&self, (x, y): CartesianCoordinate) -> RasterCoordinate {
-        ((x + self.xmax) as usize, (y + self.ymax) as usize)
+        ((x + self.xmax) as usize, (self.ymax - y) as usize)
     }
 
     pub fn to_cartesian(&self, (x, y): RasterCoordinate) -> CartesianCoordinate {

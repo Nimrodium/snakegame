@@ -1,6 +1,11 @@
-use crate::logic::{CartesianCoordinate, Dimensions, Direction, EvaluatedState, TileType};
+use crate::logic::{
+    CartesianCoordinate, Dimensions, Direction, EvaluatedState, RasterCoordinate, TileType,
+};
 use sdl3;
 use sdl3::pixels::Color;
+use sdl3::rect::Rect;
+use sdl3::render::Canvas;
+use sdl3::video::Window;
 
 #[derive(Clone, Copy, Debug)]
 pub enum Event {
@@ -55,6 +60,7 @@ impl Renderer {
         Ok(Self {
             dimensions: dimensions.clone(),
             scale,
+            canvas,
         })
     }
     pub fn draw_frame(&mut self, data: EvaluatedState) {
@@ -79,7 +85,37 @@ impl Renderer {
         }
     }
     pub fn draw_pixel(&mut self, cartesian: CartesianCoordinate, color: Color) {
-        eprintln!("drew pixel at {cartesian:?} with color: {color:?}");
+        // let (x, y) = self.scale_coordinate(self.dimensions.to_raster(cartesian));
+        let (x, y) = self
+            .dimensions
+            .to_raster(self.scale_coordinate_c(cartesian));
+        let side_length = self.scale / 2;
+        let (cx, cy) = (x - side_length, y - side_length);
+        let px = Rect::new(
+            (x * self.scale) as i32,
+            (y * self.scale) as i32,
+            self.scale as u32,
+            self.scale as u32,
+        );
+        let test_rect = Rect::new(cx as i32, cy as i32, side_length as u32, side_length as u32);
+        self.canvas.set_draw_color(color);
+        self.canvas.fill_rect(test_rect).unwrap();
+        eprintln!(
+            "drew pixel at {cartesian:?}:{:?} with color: {color:?}",
+            (cx, cy)
+        );
+    }
+    fn scale_coordinate(&self, (x, y): RasterCoordinate) -> RasterCoordinate {
+        // let scale = |x| x * self.scale / 2;
+        // let (dx, dy) = self.dimensions.get_raster_bounds();
+        // (scale(x) + (dx / 2), (dy / 2) - scale(y))
+        (x * self.scale / 2, y * self.scale / 2)
+    }
+    fn scale_coordinate_c(&self, (x, y): CartesianCoordinate) -> CartesianCoordinate {
+        // let scale = |x| x * self.scale / 2;
+        // let (dx, dy) = self.dimensions.get_raster_bounds();
+        // (scale(x) + (dx / 2), (dy / 2) - scale(y))
+        (x * self.scale as isize / 2, y * self.scale as isize / 2)
     }
     pub fn draw_dialog(&mut self, text: &str) {
         eprintln!("{}", text)
@@ -89,6 +125,14 @@ impl Renderer {
     }
 
     pub fn update(&mut self) {
-        todo!()
+        self.canvas.present();
+    }
+    pub fn clear(&mut self) {
+        self.canvas.set_draw_color(Color {
+            r: 0,
+            g: 0,
+            b: 0,
+            a: 255,
+        });
     }
 }

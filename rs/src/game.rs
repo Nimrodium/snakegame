@@ -33,9 +33,9 @@ impl Game {
             }
         }
     }
-    pub fn game_loop(&self) {
+    pub fn game_loop(&self) -> Result<(), String> {
         let mut state = State::new(&self.dimensions);
-        let mut renderer = Renderer::new(&self.dimensions, self.scale);
+        let mut renderer = Renderer::new(&self.dimensions, self.scale)?;
         let mut i = 0;
         let actions = vec![
             Some(Event::PlayPause),
@@ -56,7 +56,7 @@ impl Game {
             if let Some(ev) = user_input {
                 eprintln!("{ev:?}");
                 match ev {
-                    Event::Quit => break,
+                    Event::Quit => break Ok(()),
                     Event::PlayPause => state.toggle_playpause(),
                     _ => (),
                 }
@@ -65,6 +65,9 @@ impl Game {
             let direction = user_input.map(|ev| ev.to_direction()).flatten();
             self.step(&mut state, &mut renderer, direction);
             i += 1;
+            renderer.update();
+            sleep(Duration::from_millis(1000));
+            renderer.clear();
         }
     }
 }
