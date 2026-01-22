@@ -6,7 +6,7 @@ import pygame
 from pygame.event import Event
 
 from engine.board import Board
-from engine.shared import Coord
+from engine.shared import Coord, Direction
 from gui.drawing import Drawer
 from gui.input import Input, Key
 
@@ -60,28 +60,33 @@ class Game:
             return self.last_input
         else:
             return user_input
+
     # benchmark one frame of a 15 length snake
-    def benchmark(self) -> int:
-        def avg(xs:list[int]) -> float:
-            sum(xs)/len(xs)
+    def benchmark(self):
+        def avg(xs: list[float]) -> float:
+            return sum(xs) / len(xs)
+
         direction = Direction.Up
-        logic_times : list[int] = []
-        frame_times : list[int] = []
-        for i in range(0,15):
-            (x,y) = self.snake.get_head()
-            self.snake.add_head((x+1,y))
-        for _ in range(0,100):
+        logic_times: list[float] = []
+        frame_times: list[float] = []
+        for i in range(0, 15):
+            (x, y) = self.board.snake.get_head()
+            self.board.snake.add_head((x + 1, y))
+        for _ in range(0, 100):
             l_start = time()
-            evaluated,_,_ = self.engine.evaluate_state(direction)
+            evaluated, _, _ = self.board.evaluate_state(direction)
             f_start = time()
-            self.drawer(evaluated)
+            self.drawer.draw_board(evaluated)
             end = time()
             logic_times.append(end - l_start)
             frame_times.append(end - f_start)
         avg_logic = avg(logic_times)
         avg_frame = avg(frame_times)
-        avg_total = avg_logic+avg_frame
-        print(f"completed 100 frames of 15 length snake in {avg_total}; {avg_frame=}; {avg_logic=}")
+        avg_total = avg_logic + avg_frame
+        print(
+            f"completed 100 frames of 15 length snake in {avg_total}; {avg_frame=}; {avg_logic=}"
+        )
+
     def step(self, state: State) -> State:
         user_input = self.get_input()
         match user_input:
