@@ -1,0 +1,1 @@
+From the Impl in Rust i have a much better understanding of exactly how the architecture of snakegame works, especially the transformations applied to convert from the two coordinate systems of the renderer and logic. the overall structure of the code is essentially figured out. 

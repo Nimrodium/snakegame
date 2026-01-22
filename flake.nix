@@ -21,14 +21,15 @@
         pkgs = nixpkgs.legacyPackages.${system};
         snakeGamePy = pkgs.callPackage ./py/snakegame.nix { };
         snakeGameRs = pkgs.callPackage ./rs/snakegame.nix { inherit naersk; };
+        snakeGameJava = pkgs.callPackage ./java/snakegame.nix { };
       in
       {
-        # devShell = pkgs.mkShell {
-        #   packages = with pkgs; [ (python311.withPackages (ps: [ ps.pygame ])) ];
-        # };
+        # later make a function that just populates this from an attribute set of all the snakegame.nixes,
+        # i guess this would be map to (devshell,package) -> and then fold over devShell and package attribute set, returning the final
         devShell = {
           py = snakeGamePy.devShell;
           rs = snakeGameRs.devShell;
+          java = snakeGameJava.devShell;
         };
         packages = rec {
           py = snakeGamePy.package;
@@ -36,11 +37,4 @@
         };
       }
     );
-  # let
-  #   pkgs = nixpkgs.legacyPackges.x86_64-linux;
-  # in
-  # {
-  #   # devShell.x86_64-linux = import ./shell.nix { inherit nixpkgs; };
-  #   # packages.x86_64-linux.default = import ./default.nix { inherit nixpkgs; };
-  # };
 }
