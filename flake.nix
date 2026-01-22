@@ -26,7 +26,7 @@
       {
         # later make a function that just populates this from an attribute set of all the snakegame.nixes,
         # i guess this would be map to (devshell,package) -> and then fold over devShell and package attribute set, returning the final
-        devShell = {
+        devShells = {
           py = snakeGamePy.devShell;
           rs = snakeGameRs.devShell;
           java = snakeGameJava.devShell;
