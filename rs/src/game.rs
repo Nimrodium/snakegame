@@ -13,7 +13,7 @@ pub struct Game {
 impl Game {
     pub fn new(frame_rate: u64, dimensions: &Dimensions, scale: usize) -> Self {
         Self {
-            frame_rate,
+            frame_rate:1000/frame_rate,
             dimensions: dimensions.clone(),
             scale,
         }

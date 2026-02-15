@@ -7,6 +7,8 @@ in
   package = naersk'.buildPackage {
     src = ./.;
     inherit nativeBuildInputs;
+    pname = "snakegame-rs";
+	
   };
   devShell = pkgs.mkShell {
     nativeBuildInputs =
