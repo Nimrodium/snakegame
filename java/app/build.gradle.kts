@@ -4,3 +4,18 @@
  * This is a general purpose Gradle build.
  * Learn more about Gradle by exploring our Samples at https://docs.gradle.org/8.14.3/samples
  */
+plugins {
+    java
+    application
+}
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("io.github.libsdl4j:libsdl4j:2.28.4-1.6")
+}
+
+application {
+    mainClass = "snakegame.Main"
+}
