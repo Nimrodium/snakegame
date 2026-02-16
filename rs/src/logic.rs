@@ -115,7 +115,6 @@ impl State {
                 self.reset();
                 Scene::Playing
             }
-            _ => self.scene,
         };
         println!("toggled scene to {:?}", self.scene)
     }

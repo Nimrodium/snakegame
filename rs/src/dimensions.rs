@@ -30,7 +30,7 @@ impl Dimensions {
     }
 
     pub fn out_of_bounds(&self, (x, y): LogicalCoordinate) -> bool {
-        x < self.xmin || x > self.xmax || y < self.ymin || y > self.ymax
+        x < self.xmin*2/self.scale || x > self.xmax*2/self.scale || y < self.ymin*2/self.scale || y > self.ymax*2/self.scale
     }
 
     pub fn to_screen(&self, (x, y): LogicalCoordinate) -> ScreenCoordinates {
@@ -53,9 +53,9 @@ impl Dimensions {
     pub fn random(&self) -> LogicalCoordinate {
         let mut rng = rand::rng();
         (
-            rng.random_range((self.xmin / self.scale) as i32..=(self.xmax / self.scale) as i32)
+            rng.random_range((self.xmin*2/ self.scale) as i32..=(self.xmax*2/ self.scale) as i32)
                 as isize,
-            rng.random_range((self.ymin / self.scale) as i32..=(self.ymax / self.scale) as i32)
+            rng.random_range((self.ymin*2/ self.scale) as i32..=(self.ymax*2/ self.scale) as i32)
                 as isize,
         )
     }

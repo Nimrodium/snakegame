@@ -96,9 +96,9 @@ impl Renderer {
         let side_length = self.scale / 2;
 
         let (cx, cy) = (x.saturating_sub(side_length), y.saturating_sub(side_length));
-        let test_rect = Rect::new(cx as i32, cy as i32, side_length as u32, side_length as u32);
+        let rect = Rect::new(cx as i32, cy as i32, side_length as u32, side_length as u32);
         self.canvas.set_draw_color(color);
-        self.canvas.fill_rect(test_rect).unwrap();
+        self.canvas.fill_rect(rect).unwrap();
         eprintln!(
             "drew pixel at {cartesian:?}:{:?} with color: {color:?}",
             (cx, cy)

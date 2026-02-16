@@ -38,18 +38,18 @@ impl Game {
         let mut state = State::new(&self.dimensions);
         let mut renderer = Renderer::new(&self.dimensions, self.scale)?;
         let mut i = 0;
-        let actions = vec![
-            Some(GameEvent::PlayPause),
-            Some(GameEvent::Up),
-            None,
-            None,
-            None,
-            None,
-            Some(GameEvent::Left),
-            None,
-            None,
-            Some(GameEvent::Quit),
-        ];
+        // let actions = vec![
+        //     Some(GameEvent::PlayPause),
+        //     Some(GameEvent::Up),
+        //     None,
+        //     None,
+        //     None,
+        //     None,
+        //     Some(GameEvent::Left),
+        //     None,
+        //     None,
+        //     Some(GameEvent::Quit),
+        // ];
         loop {
             println!("Frame {i}; scene={:?}", state.scene);
             let input: Option<GameEvent> = renderer.get_input();
@@ -63,12 +63,12 @@ impl Game {
                     _ => (),
                 }
             }
-            sleep(Duration::from_millis(self.frame_rate));
+            // sleep(Duration::from_millis(self.frame_rate));
             let direction = input.map(|ev| ev.to_direction()).flatten();
             self.step(&mut state, &mut renderer, direction);
             i += 1;
             renderer.update();
-            sleep(Duration::from_millis(1000 / self.frame_rate));
+            sleep(Duration::from_millis(self.frame_rate));
             renderer.clear();
         }
     }
