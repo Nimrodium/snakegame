@@ -13,7 +13,7 @@ public class Snake {
         // );
         this.segments = new ArrayList<>(Arrays.asList(   
             Coordinate.of(0,0),
-            Coordinate.of(2,0),
+            Coordinate.of(1,0),
             Coordinate.of(2,0))
         );
     }
@@ -48,12 +48,23 @@ public class Snake {
     public boolean collision(Dimensions dimension){
         boolean wallCollision = false;
         if (dimension.outOfBounds(getHead())) {
+            System.err.println("collided with the wall");
             wallCollision = true;
         }
-        for (Coordinate seg: this.segments) {
-            if (seg.equals(getHead())) {
-                wallCollision = true;
+        // for (Coordinate seg: this.segments) {
+        //     if (seg.equals(getHead())) {
+        //         System.out.println("collided with self");
+        //         wallCollision = true;
+        //     }
+        // }
+        var equalSegments = -1;
+        for (var seg: this.segments){
+            if (seg.equals(getHead())){
+                equalSegments++;
             }
+        }
+        if (equalSegments == 1){
+            wallCollision = true;
         }
         return wallCollision;
     }

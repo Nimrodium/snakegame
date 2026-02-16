@@ -30,7 +30,7 @@ public class State {
         this.applePosition = Coordinate.of(0,0);
         this.snake = new Snake();
         this.score = 0;
-        this.scene = Scene.START;
+        this.scene = Scene.PLAYING;
         this.spawnApple();
     }
     
@@ -53,42 +53,48 @@ public class State {
     }
     private void reset(){
         this.snake = new Snake();
-        this.score = 0x0;
+        this.score = 0;
         this.willGrow = false;
         this.spawnApple();
+        this.lastDirection = Optional.empty();
     }
 
     private void spawnApple(){
-        ArrayList<Coordinate> unavailableeCoordinates = (ArrayList<Coordinate>) this.snake.getSegments().clone();
-        unavailableeCoordinates.addAll(this.getAdjacentAppleCoordinates());
+        ArrayList<Coordinate> unavailableCoordinates = (ArrayList<Coordinate>) this.snake.getSegments().clone();
+        unavailableCoordinates.addAll(this.getAdjacentAppleCoordinates());
         
         while (true){
             var randomCoordinate = this.dimensions.random();
-            if (!unavailableeCoordinates.contains(randomCoordinate)) 
-                break;    
+            if (!unavailableCoordinates.contains(randomCoordinate)) {
+                    this.applePosition = randomCoordinate;
+                    break;    
+                }
         }
     }
 
     public EvaluatedState evaluateScene(Optional<Direction> direction) {
         
-        Direction filteredDirection;
-        if (direction.isPresent()) {
-            if (!lastDirection.isEmpty()) {
-                if (!Shared.isOpposite(direction.get(), lastDirection.get())) {
-                    lastDirection = direction;
-                    filteredDirection = direction.get();
-                } else {
-                    filteredDirection = lastDirection.get();
+        Optional<Direction> filteredDirection;
+        if (direction.isPresent()){
+            if (lastDirection.isPresent()){
+                if (direction.get().isOpposite(lastDirection.get())){
+                    filteredDirection = lastDirection;
+                }else{
+                    filteredDirection = direction;
                 }
             } else {
                 lastDirection = direction;
-                System.out.println("--- Setting last dir. to: " + direction);
-                filteredDirection = lastDirection.get();
+                filteredDirection = direction;
             }
-        } else {
-            filteredDirection = lastDirection.get();
+        }else{
+            filteredDirection = lastDirection;
         }
-        this.moveSnake(Optional.of(filteredDirection));
+        lastDirection = filteredDirection;
+        // System.out.printf("fitlered direction: %s \n",filteredDirection);
+
+        this.moveSnake(filteredDirection);
+        System.out.printf("head : %s\n",this.snake.getHead());
+        System.out.printf("apple : %s\n",this.applePosition);
         willGrow = false;
 
         if (hasAteApple()) {
@@ -102,9 +108,9 @@ public class State {
             System.out.println("You Died! Fucking loserrrrrrrr");
         }
         EvaluatedState evaluated = new EvaluatedState(
-            (ArrayList) snake.segments.stream().map(
+            new ArrayList(snake.segments.stream().map(
                 seg -> EvaluatedState.Tile.of(seg,EvaluatedState.TileType.SNAKE))
-                .toList()
+                .toList())
         );
         evaluated.inner.add(EvaluatedState.Tile.of(applePosition,EvaluatedState.TileType.APPLE));
         return evaluated;
@@ -129,11 +135,6 @@ public class State {
     }
 
     private boolean hasAteApple(){
-        return this.snake.getHead() == this.applePosition;
+        return this.snake.getHead().equals(this.applePosition);
     }
-
-
-    
-
-    
-}   
+}

@@ -12,10 +12,15 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    implementation("io.github.libsdl4j:libsdl4j:2.28.4-1.6")
-}
-
 application {
     mainClass = "snakegame.Main"
+    applicationName = "snakegame-java"
 }
+
+// tasks.register<Jar>("jar") {
+//     archiveBaseName.set("snakegame-java")
+//     from(sourceSets.main.get().output)
+//     manifest {
+//         attributes["Main-Class"] = "snakegame.Main"
+//     }
+// }

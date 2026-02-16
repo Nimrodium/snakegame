@@ -4,11 +4,10 @@ import java.util.Optional;
 
 import snakegame.logic.Shared;
 import snakegame.logic.State;
-import snakegame.renderer.Renderer;
-import snakegame.renderer.Renderer.GameEvent;
 import snakegame.logic.State.Scene;
+import snakegame.renderer.Input.GameEvent;
+import snakegame.renderer.Renderer;
 class Game {
-    public 
   int frameRate;
   int scale;
   Dimensions dimensions;
@@ -20,6 +19,7 @@ class Game {
   }
 
   public void step(State state,Renderer renderer,Optional<Shared.Direction> direction){
+    
     switch (state.getScene()){
         case Scene.START -> renderer.drawDialog("Play!");
         case Scene.PAUSED -> renderer.drawDialog("Unpause");
@@ -35,12 +35,12 @@ class Game {
         var input = renderer.getInput();
         if (input.isPresent()){
             switch (input.get()){
-                case GameEvent.QUIT -> {break loop;}
+                case GameEvent.QUIT -> {renderer.close();}
                 case GameEvent.PLAYPAUSE -> state.advanceScene();
             }
         }
-        
         var direction = input.flatMap(event -> event.toDirection());
+        renderer.clear();
         this.step(state, renderer, direction);
         renderer.update();
         try{
@@ -48,7 +48,7 @@ class Game {
         }catch (InterruptedException e){
             System.err.println("frame sleep interrupted");
         }
-        renderer.clear();
+        // renderer.clear();
     }
   }
 }

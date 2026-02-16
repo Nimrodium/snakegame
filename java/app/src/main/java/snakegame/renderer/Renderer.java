@@ -2,61 +2,77 @@ package snakegame.renderer;
 // import static io.github.libsdl4j.api.Sdl.SDL_Init;
 // import static io.github.libsdl4j.api.Sdl.SDL_Quit;
 
-import java.awt.Canvas;
+import java.awt.Color;
 import java.util.Optional;
-
-import javax.swing.JFrame;
 
 import snakegame.Dimensions;
 import snakegame.EvaluatedState;
-import snakegame.logic.Shared.Direction;
+import snakegame.EvaluatedState.Tile;
+import snakegame.EvaluatedState.TileType;
+import snakegame.logic.Shared.Coordinate;
+import snakegame.renderer.Input.GameEvent;
 public class Renderer{
     
-    public enum GameEvent{
-        UP, DOWN, LEFT, RIGHT, QUIT, PLAYPAUSE;
-        public Optional<Direction> toDirection(){
-            return switch (this){
-                case UP -> Optional.of(Direction.UP);
-                case DOWN -> Optional.of(Direction.DOWN);
-                case LEFT -> Optional.of(Direction.LEFT);
-                case RIGHT -> Optional.of(Direction.RIGHT);
-                default -> Optional.empty();
-            };
-        }
-    }
+  
+ 
     Dimensions dimensions;
+    GameWindow window;
+    GameFrame frame;
+    Input input;
     int scale;
-    JFrame window;
-    Canvas canvas;
+    
     public Renderer(Dimensions dimensions,int scale){
         this.dimensions = dimensions;
         this.scale = scale;
-
-        this.window = new JFrame("SnakeGame");
-        this.window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.window.setSize(dimensions.xmax,dimensions.ymax);
-        this.window.setVisible(true);
-        /* SDL initialization ... */
+        this.frame = new GameFrame(dimensions,scale);
+        this.input = new Input();
+        this.window = new GameWindow(this.frame,dimensions,this.input);
+        // this.frame.drawPixel(Coordinate.of(50,5), Color.RED);
     }
 
     public Optional<GameEvent> getInput(){
-        return Optional.empty(); // STUB
+        // return Optional.of(GameEvent.UP); // STUB
+        return this.input.query();
     }
 
-    public void drawFrame(EvaluatedState evaluateScene) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void drawFrame(EvaluatedState evaluatedState) {
+        for (Tile px: evaluatedState.inner){
+            Color color = switch (px.type()){
+                case TileType.SNAKE -> Color.GREEN;
+                case TileType.APPLE -> Color.RED;
+            };
+            this.drawPixel(px.loc(), color);
+        }
+        // throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public void update() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.window.repaint();
+        // throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public void clear() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.frame.clear();
+        // throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public void drawDialog(String play) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void close(){
+        this.window.dispose();
+        System.exit(0);
     }
 
+    public void drawDialog(String message) {
+        System.out.printf("dialog: %s\n",message);
+        // throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    // private void pump(){}
+
+    private void drawPixel(Coordinate coordinate,Color color){
+        var screenSpace = this.dimensions.toScreen(coordinate.scale(this.scale));
+        var sideLength = this.scale/2;
+        var corner = screenSpace.translate(x -> x-sideLength,y -> y-sideLength);
+        this.frame.drawPixel(corner,color);
+        // System.err.printf("drew pixel at %s with color %s\n",coordinate,color);
+    }
 }
