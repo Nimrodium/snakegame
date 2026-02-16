@@ -34,6 +34,7 @@
         packages = rec {
           py = snakeGamePy.package;
           rs = snakeGameRs.package;
+          java = snakeGameJava.package;
         };
       }
     );
