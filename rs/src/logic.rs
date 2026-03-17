@@ -123,7 +123,7 @@ impl State {
         self.snake = Snake::new();
         self.score = 0;
         self.will_grow = false;
-
+        self.last_direction = None;
         self.spawn_apple();
     }
 

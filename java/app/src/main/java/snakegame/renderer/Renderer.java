@@ -43,17 +43,14 @@ public class Renderer{
             };
             this.drawPixel(px.loc(), color);
         }
-        // throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public void update() {
         this.window.repaint();
-        // throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public void clear() {
         this.frame.clear();
-        // throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public void close(){
@@ -63,10 +60,8 @@ public class Renderer{
 
     public void drawDialog(String message) {
         System.out.printf("dialog: %s\n",message);
-        // throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    // private void pump(){}
 
     private void drawPixel(Coordinate coordinate,Color color){
         var screenSpace = this.dimensions.toScreen(coordinate.scale(this.scale));

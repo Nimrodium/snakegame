@@ -20,13 +20,13 @@ public class Input implements KeyListener{
             };
         }
     }
-    private ArrayList<GameEvent> eventQueue;
+    private final ArrayList<GameEvent> eventQueue;
     public Input(){
-        this.eventQueue = new ArrayList();
+        this.eventQueue = new ArrayList<>();
     }
     public Optional<GameEvent> query(){
         try{
-        return Optional.of(this.eventQueue.removeFirst());
+            return Optional.of(this.eventQueue.removeFirst());
         }catch (NoSuchElementException e){
             return Optional.empty();
         }

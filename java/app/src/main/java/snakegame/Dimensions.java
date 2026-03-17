@@ -53,8 +53,8 @@ public class Dimensions {
         // (int) (Math.random()*((ymax-ymin)/scale + 1)+ymin)
         // );
         return Coordinate.of(
-            (int)(Math.random()*(xmax-xmin)+xmin)+1,
-            (int)(Math.random()*(ymax-ymin)+ymin)+1
+            (int)(Math.random()*(xmax-xmin)+xmin),
+            (int)(Math.random()*(ymax-ymin)+ymin)
         );
     }
     public Coordinate getScreenDimensions(){

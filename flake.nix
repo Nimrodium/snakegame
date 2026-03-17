@@ -31,7 +31,7 @@
           rs = snakeGameRs.devShell;
           java = snakeGameJava.devShell;
         };
-        packages = rec {
+        packages = {
           py = snakeGamePy.package;
           rs = snakeGameRs.package;
           java = snakeGameJava.package;
