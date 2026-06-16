@@ -7,7 +7,7 @@ and then rewrite it in languages im less comfortable with, (java),
 
 * *Python* = 99%
 * *Rust* = 98%
-* *Java* = 1%
+* *Java* = 98%%
 * *Scala* = 1%
 * *Kotlin* = 1%
 * *Go* = 1%
